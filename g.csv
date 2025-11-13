@@ -1,5 +1,5 @@
 Student, "Final Grade", "Final Percent", "Assessment Grade", "Assessments %", "Homework %", "Employability %", "Inflation or Deflation", Disability, Race, FRL, Gender
-Student 1,C-,            70.44,          D+,                 68.53,            62.37,        100,              1.91,                     No,         White,Yes, Male
+Student 1,C-,70.44,D+,68.53,62.37,100,1.91,No,White,Yes,Male
 Student 2,A,98.47,A,97.81,100,100,0.66,No,White,No,Male
 Student 3,D+,69.15,D-,59.96,91.52,88.69,9.19,No,Black,Yes,Female
 Student 4,D,64.92,F,59.17,74.15,86.64,5.75,No,Black,Yes,Female

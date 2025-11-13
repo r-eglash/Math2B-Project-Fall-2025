@@ -8,6 +8,24 @@ using namespace std;
 const bool DEBUG = false;
 const int col_size = 3;
 
+void iterate_through_full_line(string line, vector<string>& current_full_line_values) {
+    int i = 0;
+    string curr_string = "";
+    //put every value between commas into current_full_line_values
+    while(i <= line.length()) {
+        
+        if (line[i] == ',' || i == line.length()) {
+            current_full_line_values.push_back(curr_string);
+            curr_string = "";
+        }
+        else {
+            curr_string += line[i];
+        }
+        i ++;
+    }
+
+}
+
 // iterates through a line in the csv file, skipping initial 3 commas. then, 3 numbers are appended to current_line_values: a_i, h_i, and e_i
 void iterate_through_line(string line, vector<double>& current_line_values) {
     int comma_ticker = 0;
@@ -47,7 +65,7 @@ void iterate_through_line(string line, vector<double>& current_line_values) {
 }
 
 // opens g.csv and iterates through all lines, appending the values a_i, h_i, and e_i to A as a vector
-void interpret_data(vector<vector<double>>& A) {
+void interpret_data(vector<vector<double>>& A, vector<vector<string>>& full_matrix) {
     // open csv
     ifstream infile;
     infile.open("g.csv");
@@ -55,8 +73,7 @@ void interpret_data(vector<vector<double>>& A) {
 
     // skip the first few lines
     getline(infile, line);
-    getline(infile, line);
-    
+
     // for each line
     while(getline(infile, line)) {   
         vector<double> current_line_values;
@@ -73,6 +90,17 @@ void interpret_data(vector<vector<double>>& A) {
         // add current student's scores to A
         A.push_back(current_line_values);
 
+        // now for full matrix
+        vector<string> current_full_line_values;
+        iterate_through_full_line(line, current_full_line_values);
+        full_matrix.push_back(current_full_line_values);
+
+        if (DEBUG) {
+            cout << endl << "current_full_line_values: ";
+            for (int j = 0; j < current_full_line_values.size(); j ++) {
+                cout << current_full_line_values.at(j) << " ";
+            }
+        }
     }
     
 }
@@ -104,12 +132,18 @@ void multiply_matrix(vector<vector<double>> A, vector<double> w, vector<double>&
 }
 
 // creates a file with each line of g as a line in the file
-void write_to_file(vector<double> g, string flnm) {
+void write_to_file(vector<vector<string>> full_matrix, vector<double> g, string flnm) {
     ofstream outfile;
     outfile.open(flnm);
     if (outfile) {
+        outfile << "Student #, Weighted Score, Disability, Race, FRL, Gender" << endl;
         for (int i = 0; i < g.size(); i ++ ) {
-            outfile << g[i] << endl;
+            // student # (full_matrix[i][0],
+            outfile << full_matrix[i][0] << ": "
+            // score
+            << g[i] << "   "
+            // disability, race, frl, gender)
+            << full_matrix[i][8] << ", " << full_matrix[i][9] << ", " << full_matrix[i][10] << ", " << full_matrix[i][11] << ", " << endl;
         }
         cout << "\nFile successfully generated.\n";
     }
@@ -120,6 +154,7 @@ void write_to_file(vector<double> g, string flnm) {
 }
 
 int main(){
+    vector<vector<string>> full_matrix;
     // declare all 3 matrices
     vector<vector<double>> A;
     vector<double> w;
@@ -133,11 +168,18 @@ int main(){
         exit(0);
     }
 
-    // fill A with 3-wide columns of csv's length
-    interpret_data(A);
+    // fill A with 3-wide columns of csv's length, also create full_matrix which has all data
+    interpret_data(A, full_matrix);
 
     cout << "\nMatrix A succesfully generated\n" << endl;
     
+    /*for (int i = 0; i < full_matrix.size() ; i ++ ) {
+        for (int j = 0; j < full_matrix[i].size(); j ++ ) {
+            cout << full_matrix[i][j] << " ";
+        }
+        cout << endl;
+    }*/
+
     // printing out A
     //cout << "A: first num is " << A[0][0] << endl;
     /*for (int i = 0; i < A.size() ; i ++ ) {
@@ -177,7 +219,7 @@ int main(){
         string flnm;
         cout << "\nPlease enter a valid filename (including .txt): ";
         cin >> flnm;
-        write_to_file(g, flnm);
+        write_to_file(full_matrix, g, flnm);
     }
     
     return 0;
